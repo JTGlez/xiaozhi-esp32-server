@@ -1,9 +1,11 @@
 """MiniMax needs its own host for TTS and its own request options for the LLM."""
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-from core.providers.llm.openai.openai import LLMProvider
-from core.providers.tts.minimax_httpstream import TTSProvider
+# These modules set up logging on import, which needs the gitignored data/.config.yaml.
+with patch("config.logger.setup_logging", return_value=MagicMock()):
+    from core.providers.llm.openai.openai import LLMProvider
+    from core.providers.tts.minimax_httpstream import TTSProvider
 
 
 def tts(tmp_path, **config):
