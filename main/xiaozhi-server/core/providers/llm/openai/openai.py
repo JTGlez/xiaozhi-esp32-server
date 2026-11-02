@@ -27,7 +27,8 @@ class LLMProvider(LLMProviderBase):
             self.base_url = config.get("base_url")
         else:
             self.base_url = config.get("url")
-        
+        self.extra_body = config.get("extra_body") or {}
+
         timeout_config = config.get("timeout")
         if isinstance(timeout_config, dict):
             # 细粒度超时配置
@@ -88,6 +89,9 @@ class LLMProvider(LLMProviderBase):
                 request_params.setdefault("extra_body", {}).update(params)
                 logger.bind(tag=TAG).info(f"为域名 {domain} 禁用思考模式，参数: {params}")
                 break
+        # Provider-specific options set in the config take precedence.
+        if self.extra_body:
+            request_params.setdefault("extra_body", {}).update(self.extra_body)
 
     def response(self, session_id, dialogue, **kwargs):
         dialogue = self.normalize_dialogue(dialogue)
